@@ -1,6 +1,6 @@
 # sloth
+sloth:bit from sunfounder
 
-SunFounder Sloth:Bit Driver
 
 ## License
 
