@@ -1,7 +1,7 @@
 
 //
 //% weight=5 color=#1BAFEA icon="\uf1b0"
-namespace custom {
+namespace sloth {
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
     const MODE2 = 0x01
