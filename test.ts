@@ -1,1 +1,23 @@
-// tests go here; this will not be compiled when this package is used as a library
+sloth.calibrate(
+-3,
+10,
+5,
+7
+)
+basic.forever(() => {
+    sloth.do_action(sloth.action_name.walk, 1, 50)
+    sloth.do_action(sloth.action_name.walk_backward, 1, 50)
+    sloth.do_action(sloth.action_name.turn_left, 1, 50)
+    sloth.do_action(sloth.action_name.turn_right, 1, 50)
+    sloth.do_action(sloth.action_name.moonwalk_left, 1, 50)
+    sloth.do_action(sloth.action_name.moonwalk_right, 1, 50)
+    sloth.do_action(sloth.action_name.shake_left, 1, 50)
+    sloth.do_action(sloth.action_name.shake_right, 1, 50)
+    sloth.do_action(sloth.action_name.go_up_and_down, 1, 50)
+    sloth.do_action(sloth.action_name.swing, 1, 50)
+    sloth.do_action(sloth.action_name.walk_manly, 1, 50)
+    sloth.do_action(sloth.action_name.walk_backward_manly, 1, 50)
+    sloth.do_action(sloth.action_name.walk_shily, 1, 50)
+    sloth.do_action(sloth.action_name.walk_backward_shily, 1, 50)
+    sloth.do_action(sloth.action_name.big_swing, 1, 50)
+})

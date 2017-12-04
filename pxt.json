@@ -9,8 +9,7 @@
     },
     "files": [
         "README.md",
-        "sloth.ts",
-        "actions.ts"
+        "sloth.ts"
     ],
     "testFiles": [
         "test.ts"
