@@ -293,7 +293,7 @@ namespace sloth {
     //% o3.min=-30 o3.max=30
     //% o4.min=-30 o4.max=30
     export function calibrate(o1: number, o2: number, o3: number, o4: number): void {
-        offset = [-o1, -o2, -o3, -o4]
+        offset = [o1, o2, o3, o4]
         home();
     }
 
