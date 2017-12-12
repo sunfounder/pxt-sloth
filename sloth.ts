@@ -174,6 +174,59 @@ namespace sloth {
     let servo_positions = [0, 0, 0, 0];   // ralative position to home_position
     let offset = [0, 0, 0, 0];
 
+    let img_none: Image = null
+    let img_upper_left: Image = null
+    let img_bottom_left: Image = null
+    let img_upper_right: Image = null
+    let img_bottom_right: Image = null
+
+    let upper_left_value = 0
+    let bottom_left_value = 0
+    let upper_right_value = 0
+    let bottom_right_value = 0
+
+    let servo_number = 0
+    let temp_cali_value = 0
+    let select_mode_flag = 0
+
+    img_none = images.createImage(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    img_upper_left = images.createImage(`
+        # # . . .
+        # # . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    img_bottom_left = images.createImage(`
+        . . . . .
+        . . . . .
+        . . . . .
+        # # . . .
+        # # . . .
+        `)
+    img_upper_right = images.createImage(`
+        . . . # #
+        . . . # #
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    img_bottom_right = images.createImage(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . # #
+        . . . # #
+        `)
+
+    select_mode_flag = 1
+
     function i2cwrite(reg: number, value: number) {
         let buf = pins.createBuffer(2)
         buf[0] = reg
@@ -234,7 +287,7 @@ namespace sloth {
         // 50hz: 20,000 us
         let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
         let value = v_us * 4096 / 20000
-        setPwm(index + 7, 0, value)
+        setPwm(index-1, 0, value)
     }
 
     // blockId=sloth_servo_write_all block="Servo all degree %angles"
@@ -314,6 +367,101 @@ namespace sloth {
         }
         home()
     }
+
+    input.onButtonPressed(Button.A, () => {
+        if (select_mode_flag == 1) {
+            servo_number += 1
+            if (servo_number > 4) {
+                servo_number = 1
+            }
+        } else {
+            temp_cali_value += 1
+        }
+    })
+
+    input.onButtonPressed(Button.B, () => {
+        if (select_mode_flag == 1) {
+            servo_number += -1
+            if (servo_number < 1) {
+                servo_number = 4
+            }
+        } else {
+            temp_cali_value += -1
+        }
+    })
+
+    input.onButtonPressed(Button.AB, () => {
+        if (select_mode_flag != 1) {
+            servo_number += 1
+            if (servo_number > 4) {
+                servo_number = 1
+            }
+        }
+        select_mode_flag = Math.abs(1 - select_mode_flag)
+    })
+
+    function select_servo()  {
+        temp_cali_value = 0
+        if (servo_number == 1) {
+            img_upper_left.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+        } else if (servo_number == 2) {
+            img_bottom_left.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+        } else if (servo_number == 3) {
+            img_upper_right.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+        } else if (servo_number == 4) {
+            img_bottom_right.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+        }
+    }
+
+    function cali_value()  {
+        while (select_mode_flag != 1) {
+            if (servo_number == 1) {
+                upper_right_value = temp_cali_value
+            } else if (servo_number == 2) {
+                bottom_right_value = temp_cali_value
+            } else if (servo_number == 3) {
+                upper_left_value = temp_cali_value
+            } else if (servo_number == 4) {
+                bottom_left_value = temp_cali_value
+            }
+            custom.calibrate(
+            upper_left_value,
+            bottom_left_value,
+            upper_right_value,
+            bottom_right_value
+            )
+            basic.showNumber(temp_cali_value)
+        }
+    }
+
+    /**
+     * Calibrate 4 servos by buttonA, buttonB, and A+B.
+     */
+    //% blockId=sloth_cali_by_button block="calibrate by buttons"
+    //% weight=100
+    export function cali_by_button() : void {
+        basic.forever(() => {
+            if (select_mode_flag == 1) {
+                select_servo()
+            } else {
+                cali_value()
+            }
+        })
+
+    }
+
 }
 
 
