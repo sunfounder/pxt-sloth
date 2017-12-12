@@ -436,7 +436,7 @@ namespace sloth {
             } else if (servo_number == 4) {
                 bottom_left_value = temp_cali_value
             }
-            custom.calibrate(
+            sloth.calibrate(
             upper_left_value,
             bottom_left_value,
             upper_right_value,
