@@ -18,15 +18,23 @@ namespace sloth {
     const ALL_LED_OFF_L = 0xFC
     const ALL_LED_OFF_H = 0xFD
 
-    export enum Servos {
-        S1 = 0x01,
-        S2 = 0x02,
-        S3 = 0x03,
-        S4 = 0x04,
-        S5 = 0x05,
-        S6 = 0x06,
-        S7 = 0x07,
-        S8 = 0x08
+    export enum PWMChn {
+        CH0 = 0,
+        CH1 = 1,
+        CH2 = 2,
+        CH3 = 3,
+        CH4 = 4,
+        CH5 = 5,
+        CH6 = 6,
+        CH7 = 7,
+        CH8 = 8,
+        CH9 = 9,
+        CH10 = 10,
+        CH11 = 11,
+        CH12 = 12,
+        CH13 = 13,
+        CH14 = 14,
+        CH15 = 15
     }
 
     let action_data = [
@@ -85,11 +93,11 @@ namespace sloth {
             [0, 0, 0, 0]
         ],
         [   // shake left
-            [-40,0,-20,0],
-            [-40,40,-20,30],
-            [-20,40,-20,30],
-            [-40,40,-20,30],
-            [-20,40,-20,30],
+            [-40, 0, -20, 0],
+            [-40, 40, -20, 30],
+            [-20, 40, -20, 30],
+            [-40, 40, -20, 30],
+            [-20, 40, -20, 30],
         ],
         [   // shake right
             [20, 0, 40, 0],
@@ -99,10 +107,10 @@ namespace sloth {
             [20, -30, 10, -30],
         ],
         [   // go up and down
-            [0,50,0,-50],
+            [0, 50, 0, -50],
         ],
         [   // swing
-            [0,-40,0,40],
+            [0, -40, 0, 40],
         ],
         [    // walk manly
             [-20, 0, 20, -40],
@@ -146,29 +154,29 @@ namespace sloth {
         ],
 
         [   // big swing
-            [0,-90,0,90],
+            [0, -90, 0, 90],
         ],
     ]
     export enum action_name {
-        walk                = 0,
-        walk_backward       = 1,
-        turn_left           = 2,
-        turn_right          = 3,
-        moonwalk_left       = 4,
-        moonwalk_right      = 5,
-        shake_left          = 6,
-        shake_right         = 7,
-        go_up_and_down      = 8,
-        swing               = 9,
-        walk_manly          = 10,
+        walk = 0,
+        walk_backward = 1,
+        turn_left = 2,
+        turn_right = 3,
+        moonwalk_left = 4,
+        moonwalk_right = 5,
+        shake_left = 6,
+        shake_right = 7,
+        go_up_and_down = 8,
+        swing = 9,
+        walk_manly = 10,
         walk_backward_manly = 11,
-        walk_shily          = 12,
+        walk_shily = 12,
         walk_backward_shily = 13,
-        big_swing           = 14
+        big_swing = 14
     }
 
     let initialized = false
-    let servos = [Servos.S1, Servos.S2, Servos.S3, Servos.S4];
+    let servos = [PWMChn.CH0, PWMChn.CH1, PWMChn.CH2, PWMChn.CH3];
     let origin_positions = [90, 90, 90, 90];
     let home_positions = [0, 0, 0, 0];
     let servo_positions = [0, 0, 0, 0];   // ralative position to home_position
@@ -179,13 +187,14 @@ namespace sloth {
     let img_bottom_left: Image = null
     let img_upper_right: Image = null
     let img_bottom_right: Image = null
+    let img_spanner: Image = null
 
-    let upper_left_value = 0
-    let bottom_left_value = 0
-    let upper_right_value = 0
-    let bottom_right_value = 0
+    let left_leg_value = 0
+    let left_foot_value = 0
+    let right_leg_value = 0
+    let right_foot_value = 0
 
-    let servo_number = 0
+    let servo_number = 1
     let temp_cali_value = 0
     let select_mode_flag = 0
 
@@ -223,6 +232,13 @@ namespace sloth {
         . . . . .
         . . . # #
         . . . # #
+        `)
+    img_spanner = images.createImage(`
+        . # . # .
+        . # # # .
+        . . # . .
+        . # # # .
+        . # . # .
         `)
 
     select_mode_flag = 1
@@ -262,7 +278,12 @@ namespace sloth {
         i2cwrite(MODE1, oldmode | 0xa1);
     }
 
-    function setPwm(channel: number, on: number, off: number): void {
+    //% blockId=sloth_set_pwm block="pwm set channel %channel|on: %on|off: %off"
+    //% advanced=true
+    //% on.min=0 on.max=4095
+    //% off.min=0 off.max=4095
+    //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
+    export function setPwm(channel: PWMChn, on: number, off: number): void {
         if (channel < 0 || channel > 15)
             return;
 
@@ -275,19 +296,18 @@ namespace sloth {
         pins.i2cWriteBuffer(PCA9685_ADDRESS, buf);
     }
 
-    // blockId=sloth_servo_write block="Servo %index|degree %degree"
-    // weight=10
-    // blockGap=50
-    // degree.min=0 degree.max=180
-    // index.fieldEditor="gridpicker" index.fieldOptions.columns=4
-    export function servo_write(index: Servos, degree: number): void {
+    //% blockId=sloth_servo_write block="Servo %channel|degree %degree"
+    //% advanced=true
+    //% degree.min=0 degree.max=180
+    //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
+    export function servo_write(channel: PWMChn, degree: number): void {
         if (!initialized) {
             initPCA9685()
         }
         // 50hz: 20,000 us
         let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
         let value = v_us * 4096 / 20000
-        setPwm(index-1, 0, value)
+        setPwm(channel - 1, 0, value)
     }
 
     // blockId=sloth_servo_write_all block="Servo all degree %angles"
@@ -359,7 +379,7 @@ namespace sloth {
     //% weight=100
     //% speed.min=1 speed.max=100
     //% action.fieldEditor="gridpicker" action.fieldOptions.columns=2
-    export function do_action(action: action_name, step: number = 1, speed: number = 50) : void {
+    export function do_action(action: action_name, step: number = 1, speed: number = 50): void {
         for (let i = 0; i < step; i++) {
             for (let data of action_data[action]) {
                 servo_move(data, speed);
@@ -368,258 +388,158 @@ namespace sloth {
         home()
     }
 
-    input.onButtonPressed(Button.A, () => {
-        if (select_mode_flag == 1) {
-            servo_number += 1
-            if (servo_number > 4) {
-                servo_number = 1
-            }
-        } else {
-            temp_cali_value += 1
-        }
-    })
-
-    input.onButtonPressed(Button.B, () => {
-        if (select_mode_flag == 1) {
-            servo_number += -1
-            if (servo_number < 1) {
-                servo_number = 4
-            }
-        } else {
-            temp_cali_value += -1
-        }
-    })
-
-    input.onButtonPressed(Button.AB, () => {
-        if (select_mode_flag != 1) {
-            servo_number += 1
-            if (servo_number > 4) {
-                servo_number = 1
-            }
-        }
-        select_mode_flag = Math.abs(1 - select_mode_flag)
-    })
-
-    function select_servo()  {
-        temp_cali_value = 0
+    function select_servo() {   // select_mode_flag == 1
         if (servo_number == 1) {
             img_upper_left.showImage(0)
             basic.pause(100)
             img_none.showImage(0)
             basic.pause(100)
+            temp_cali_value = right_leg_value
         } else if (servo_number == 2) {
+            img_upper_right.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+            temp_cali_value = left_leg_value
+        } else if (servo_number == 3) {
             img_bottom_left.showImage(0)
             basic.pause(100)
             img_none.showImage(0)
             basic.pause(100)
+            temp_cali_value = right_foot_value
+        } else if (servo_number == 4) {
+            img_bottom_right.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+            temp_cali_value = left_foot_value
+        }
+    }
+
+    function cali_value() {    //  select_mode_flag == 2
+        if (servo_number == 1) {
+            right_leg_value = temp_cali_value
+            //sloth.servo_write(servos[2], 90 + right_leg_value)
+        } else if (servo_number == 2) {
+            left_leg_value = temp_cali_value
+            //sloth.servo_write(servos[0], 90 + left_leg_value)
         } else if (servo_number == 3) {
+            right_foot_value = temp_cali_value
+            //sloth.servo_write(servos[3], 90 + right_foot_value)
+        } else if (servo_number == 4) {
+            left_foot_value = temp_cali_value
+            //sloth.servo_write(servos[1], 90 + left_foot_value)
+        }
+        sloth.calibrate(
+            left_leg_value,
+            left_foot_value,
+            right_leg_value,
+            right_foot_value
+        )
+        basic.pause(10)
+        //basic.showNumber(temp_cali_value)
+    }
+
+    function show_cali_value() {    //  select_mode_flag == 3
+        if (servo_number == 1) {
+            img_upper_left.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+            basic.showNumber(right_leg_value)
+            basic.pause(100)
+        } else if (servo_number == 2) {
             img_upper_right.showImage(0)
             basic.pause(100)
             img_none.showImage(0)
+            basic.pause(100)
+            basic.showNumber(left_leg_value)
+            basic.pause(100)
+        } else if (servo_number == 3) {
+            img_bottom_left.showImage(0)
+            basic.pause(100)
+            img_none.showImage(0)
+            basic.pause(100)
+            basic.showNumber(right_foot_value)
             basic.pause(100)
         } else if (servo_number == 4) {
             img_bottom_right.showImage(0)
             basic.pause(100)
             img_none.showImage(0)
             basic.pause(100)
+            basic.showNumber(left_foot_value)
+            basic.pause(100)
         }
     }
 
-    function cali_value()  {
-        while (select_mode_flag != 1) {
-            if (servo_number == 1) {
-                upper_right_value = temp_cali_value
-            } else if (servo_number == 2) {
-                bottom_right_value = temp_cali_value
-            } else if (servo_number == 3) {
-                upper_left_value = temp_cali_value
-            } else if (servo_number == 4) {
-                bottom_left_value = temp_cali_value
-            }
-            sloth.calibrate(
-            upper_left_value,
-            bottom_left_value,
-            upper_right_value,
-            bottom_right_value
-            )
-            basic.showNumber(temp_cali_value)
-        }
-    }
 
     /**
      * Calibrate 4 servos by buttonA, buttonB, and A+B.
      */
     //% blockId=sloth_cali_by_button block="calibrate by buttons"
     //% weight=100
-    export function cali_by_button() : void {
+    export function cali_by_button(): void {
+        basic.showString("Cali")//brate 4 servos by button A, B & A+B")
+
+        input.onButtonPressed(Button.A, () => {
+            if (select_mode_flag == 1) {
+                servo_number += -1
+                if (servo_number < 1) {
+                    servo_number = 4
+                }
+            }
+            else if (select_mode_flag == 2) {
+                temp_cali_value += -1
+            }
+            else if (select_mode_flag == 3) {
+                select_mode_flag = 1
+            }
+        })
+
+        input.onButtonPressed(Button.B, () => {
+            if (select_mode_flag == 1) {
+                servo_number += 1
+                if (servo_number > 4) {
+                    servo_number = 1
+                }
+            }
+            else if (select_mode_flag == 2) {
+                temp_cali_value += 1
+            }
+            else if (select_mode_flag == 3) {
+                select_mode_flag = 1
+            }
+        })
+
+        input.onButtonPressed(Button.AB, () => {
+            if (select_mode_flag == 1) {  // confirm the current servo select
+                select_mode_flag = 2
+            }
+            else if (select_mode_flag == 2) {  // confirm the current servo cali
+                select_mode_flag = 3
+            }
+            else if (select_mode_flag == 3) {  // return to the servo select
+                select_mode_flag = 1
+                //servo_number += 1
+                //if (servo_number > 4) {
+                //    servo_number = 1
+                //}
+            }
+        })
+
         basic.forever(() => {
             if (select_mode_flag == 1) {
                 select_servo()
-            } else {
+            }
+            else if (select_mode_flag == 2) {
+                img_spanner.showImage(0)
                 cali_value()
+            }
+            else if (select_mode_flag == 3) {
+                show_cali_value()
             }
         })
 
     }
 
 }
-
-
-/*
-[   // left foot support
-    [20, 0, 40, 0],
-    [20, -30, 40, -30],
-    [20, -30, 10, -30],
-    [20, -30, 40, -30],
-    [20, -30, 10, -30],
-
-    [20, -30, 40, -30],
-    [20, 0, 40, -30],
-    [20, 80, 40, -30],
-    [20, 0, 40, -30],
-    [20, -80, 40, -30],
-    [20, 0, 40, -30],
-    [20, 80, 40, -30],
-    [20, 0, 40, -30],
-    [20, -30, 40, -30],
-    [20, 0, 40, 0],
-    [0, 0, 0, 0],
-],
-[   // right foot support 16-31
-    [-40, 0, -20, 0],
-    [-40, 40, -20, 30],
-    [-20, 40, -20, 30],
-    [-40, 40, -20, 30],
-    [-20, 40, -20, 30],
-
-    [-40, 40, -20, 30],
-    [-40, 40, -20, 0],
-    [-40, 40, -20, -80],
-    [-40, 40, -20, 0],
-    [-40, 40, -20, 80],
-    [-40, 40, -20, 0],
-    [-40, 40, -20, -80],
-    [-40, 40, -20, 0],
-    [-40, 40, -20, 30],
-    [-40, 0, -20, 0],
-    [0, 0, 0, 0],
-],
-[   // split step
-    [0, -40, 0, 0],
-    [20, -30, 20, 20],
-    [40, 0, 40, 30],
-    [0, 0, 0, 40],
-    [-20, -20, -20, 30],
-    [-40, -30, -40, 0],
-
-    [0, -40, 0, 0],
-    [0, 0, 0, 0],
-],
-[   // dance4
-    [0, -20, 0, 20],
-    [0, 0, 0, 0],
-    [0, -20, 0, 20],
-    [0, 0, 0, 0],
-    [0, -20, 0, 20],
-    [0, 0, 0, 0],
-    [0, -20, 0, 20],
-    [0, 0, 0, 0],
-
-    [0, -50, 0, 50],
-    [0, 0, 0, 0],
-    [0, -50, 0, 50],
-    [0, 0, 0, 0],
-    [0, -50, 0, 50],
-    [0, 0, 0, 0],
-    [0, -50, 0, 50],
-    [0, 0, 0, 0],
-
-    [0, -40, 0, 40],
-    [0, -50, 0, 50],
-    [0, -60, 0, 60],
-    [0, 0, 0, 0,],
-],
-[   // dance5
-    [35, 0, 15, 0],    //左脚并向右脚
-    [35, 30, 15, 30],
-    [-35, 30, 15, 30],
-    [-20, 0, 15, 0],
-    [0, 0, 0, 0],
-
-    [0, -40, 0, 40],    //内翻转脚
-    [-30, -40, -20, 40],
-    [0, -40, 0, 40],
-    [20, -40, 30, 40],
-
-
-    [0, -40, 0, 40],    //原地起落转脚
-    [20, -40, -20, 40],
-    [20, -20, -20, 20],
-    [20, 0, -20, 0],
-    [-20, -10, 20, 10],
-    [-10, -30, 10, 30],
-
-    [0, -40, 0, 40],
-    [0, 0, 0, 0],
-],
-[   // dance6
-    [0, -40, 0, -20],        //外八步伐-前进
-    [25, -40, 18, -20],
-    [25, 0, 18, 0],
-    [0, 20, 0, 40],
-    [-18, 20, -25, 40],
-    [-18, 0, -25, 0],
-
-    [0, -40, 0, -20],        //外八步伐-原地踏步
-    [25, -40, 18, -20],
-    [0, 0, 0, 0],
-    [0, 20, 0, 40],
-    [-18, 20, -25, 40],
-    [0, 0, 0, 0],
-
-    [0, -40, 0, -20],        //外八步伐-后退
-    [-25, -40, -18, -20],
-    [-25, 0, -18, 0],
-    [0, 20, 0, 40],
-    [18, 20, 25, 40],
-    [18, 0, 25, 0],
-
-    [0, -40, 0, -20],        //官网步伐-前进
-    [30, -40, 30, -20],
-    [30, 0, 30, 0],
-    [0, 20, 0, 40],
-    [-30, 20, -30, 40],
-    [-30, 0, -30, 0],
-
-    [0, -40, 0, -20],        //官网步伐-后退
-    [-30, -40, -30, -20],
-    [-30, 0, -30, 0],
-    [0, 20, 0, 40],
-    [30, 20, 30, 40],
-    [30, 0, 30, 0],
-
-    [15, 0, 15, 0],
-    [0, 0, 0, 0],
-],
-[   // left support 1-2
-    [20, -20, 40, -30],
-    [20, 0, 40, -30],
-    [20, 80, 40, -30],
-    [20, 0, 40, -30],
-    [0, 0, 0, 0],
-],
-[   // left support 1-3
-    [20, 80, 40, -30],
-    [20, 0, 40, -30],
-    [20, -30, 40, -30],
-    [20, 0, 40, 0],
-    [0, 0, 0, 0],
-],
-[   // right support 1-1
-    [-40, 0, -20, 0],
-    [-40, 40, -20, 30],
-    [-20, 40, -20, 30],
-    [-40, 40, -20, 30],
-    [-20, 40, -20, 30],
-]
-*/
