@@ -176,7 +176,8 @@ namespace sloth {
     }
 
     let initialized = false
-    let servos = [PWMChn.CH0, PWMChn.CH1, PWMChn.CH2, PWMChn.CH3];
+    // let servos = [left_leg, left_foot, right_leg, right_foot]
+    let servos = [PWMChn.CH1, PWMChn.CH2, PWMChn.CH3, PWMChn.CH4];
     let origin_positions = [90, 90, 90, 90];
     let home_positions = [0, 0, 0, 0];
     let servo_positions = [0, 0, 0, 0];   // ralative position to home_position
