@@ -177,9 +177,8 @@ namespace sloth {
 
     let initialized = false
     // let servos = [left_leg, left_foot, right_leg, right_foot]
-    let servos = [PWMChn.CH1, PWMChn.CH2, PWMChn.CH3, PWMChn.CH4];
+    let servos = [PWMChn.CH0, PWMChn.CH1, PWMChn.CH2, PWMChn.CH3];
     let origin_positions = [90, 90, 90, 90];
-    let home_positions = [0, 0, 0, 0];
     let servo_positions = [0, 0, 0, 0];   // ralative position to home_position
     let offset = [0, 0, 0, 0];
 
@@ -308,17 +307,18 @@ namespace sloth {
         // 50hz: 20,000 us
         let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
         let value = v_us * 4096 / 20000
-        setPwm(channel - 1, 0, value)
+        setPwm(channel, 0, value)
     }
 
     // blockId=sloth_servo_write_all block="Servo all degree %angles"
     // weight=10
     // angles.min=0 angles.max=180
     export function servo_write_all(angles: number[]): void {
-        for (let i = 0; i <= servos.length; i++) {
+        for (let i = 0; i < servos.length; i++) {
             servo_write(servos[i], origin_positions[i] + angles[i] + offset[i]); // ralative angle to home
         }
     }
+
     /**
      * servo move, input 4 elements array, to move all servo
      * @param speed ; eg: 50
@@ -356,11 +356,11 @@ namespace sloth {
     //% blockId=sloth_home block="home"
     //% weight=100
     export function home(): void {
-        servo_positions = home_positions
+        servo_positions = [0, 0, 0, 0];
         servo_write_all(servo_positions);
     }
 
-    //% blockId=sloth_calibrate block="calibrate | Upper Left %o1| Bottom Left %o2| Upper Right %o3| Bottom Right %o4"
+    //% blockId=sloth_calibrate block="calibrate | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
     //% weight=100
     //% o1.min=-30 o1.max=30
     //% o2.min=-30 o2.max=30
@@ -369,6 +369,17 @@ namespace sloth {
     export function calibrate(o1: number, o2: number, o3: number, o4: number): void {
         offset = [o1, o2, o3, o4]
         home();
+    }
+
+    //% blockId=sloth_write block="Sloth | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
+    //% o1.min=-90 o1.max=90
+    //% o2.min=-90 o2.max=90
+    //% o3.min=-90 o3.max=90
+    //% o4.min=-90 o4.max=90
+    //% advanced=true
+    export function sloth_write(o1: number, o2: number, o3: number, o4: number): void {
+        servo_positions = [o1, o2, o3, o4]
+        servo_write_all(servo_positions);
     }
 
     /**
