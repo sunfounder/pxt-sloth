@@ -1,6 +1,6 @@
 {
     "name": "sloth",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "sloth:bit from sunfounder",
     "license": "MIT",
     "dependencies": {
