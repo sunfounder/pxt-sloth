@@ -2,6 +2,11 @@
 //
 //% weight=5 color=#1BAFEA icon="\uf1b0"
 namespace sloth {
+    let right_leg = PWMChn.CH6
+    let right_foot = PWMChn.CH7
+    let left_foot = PWMChn.CH8
+    let left_leg = PWMChn.CH9
+
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
     const MODE2 = 0x01
@@ -176,12 +181,13 @@ namespace sloth {
     }
 
     let initialized = false
-    // let servos = [left_leg, left_foot, right_leg, right_foot]
-    let servos = [PWMChn.CH0, PWMChn.CH1, PWMChn.CH2, PWMChn.CH3];
+    let servos = [left_leg, left_foot, right_leg, right_foot]
+    //let servos = [PWMChn.CH0, PWMChn.CH1, PWMChn.CH2, PWMChn.CH3];
     let origin_positions = [90, 90, 90, 90];
     let servo_positions = [0, 0, 0, 0];   // ralative position to home_position
     let offset = [0, 0, 0, 0];
 
+    // variables for calibrate by buttons
     let img_none: Image = null
     let img_upper_left: Image = null
     let img_bottom_left: Image = null
@@ -243,6 +249,10 @@ namespace sloth {
 
     select_mode_flag = 1
 
+    // variables for microphone
+    let event_src_mic = 12
+    let event_mic_heard = 1
+
     function i2cwrite(reg: number, value: number) {
         let buf = pins.createBuffer(2)
         buf[0] = reg
@@ -296,7 +306,7 @@ namespace sloth {
         pins.i2cWriteBuffer(PCA9685_ADDRESS, buf);
     }
 
-    //% blockId=sloth_servo_write block="Servo %channel|degree %degree"
+    //% blockId=sloth_servo_write block="set servo %channel|degree %degree"
     //% advanced=true
     //% degree.min=0 degree.max=180
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
@@ -310,7 +320,7 @@ namespace sloth {
         setPwm(channel, 0, value)
     }
 
-    // blockId=sloth_servo_write_all block="Servo all degree %angles"
+    // blockId=sloth_servo_write_all block="set servo all degree %angles"
     // weight=10
     // angles.min=0 angles.max=180
     export function servo_write_all(angles: number[]): void {
@@ -323,7 +333,7 @@ namespace sloth {
      * servo move, input 4 elements array, to move all servo
      * @param speed ; eg: 50
     */
-    // blockId=sloth_servo_move block="Servo move to %target| %speed|dps"
+    // blockId=sloth_servo_move block="set servo move to %target| %speed|dps"
     // weight=10
     // speed.min=1 speed.max=100
     export function servo_move(targets: number[], speed: number = 50): void {
@@ -350,34 +360,34 @@ namespace sloth {
     }
 
     /**
-     * home: 4 servos turn to 90 degree
+     * stand still: 4 servos turn to 90 degree
      * @param: none
      */
-    //% blockId=sloth_home block="home"
-    //% weight=100
-    export function home(): void {
+    //% blockId=sloth_stand_still block="stand still"
+    //% weight=100 blockGap=10
+    export function stand_still(): void {
         servo_positions = [0, 0, 0, 0];
         servo_write_all(servo_positions);
     }
 
-    //% blockId=sloth_calibrate block="calibrate | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
-    //% weight=100
+    //% blockId=sloth_set_offset block="set offset | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
+    //% weight=45
     //% o1.min=-30 o1.max=30
     //% o2.min=-30 o2.max=30
     //% o3.min=-30 o3.max=30
     //% o4.min=-30 o4.max=30
-    export function calibrate(o1: number, o2: number, o3: number, o4: number): void {
+    export function set_offset(o1: number, o2: number, o3: number, o4: number): void {
         offset = [o1, o2, o3, o4]
-        home();
+        stand_still();
     }
 
-    //% blockId=sloth_write block="Sloth | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
+    //% blockId=sloth_set_gesture block="set gesture | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
     //% o1.min=-90 o1.max=90
     //% o2.min=-90 o2.max=90
     //% o3.min=-90 o3.max=90
     //% o4.min=-90 o4.max=90
     //% advanced=true
-    export function sloth_write(o1: number, o2: number, o3: number, o4: number): void {
+    export function set_gesture(o1: number, o2: number, o3: number, o4: number): void {
         servo_positions = [o1, o2, o3, o4]
         servo_write_all(servo_positions);
     }
@@ -388,7 +398,7 @@ namespace sloth {
      * @param speed ; eg: 50
      */
     //% blockId=sloth_do_action block="%action|%step|step in %speed|speed"
-    //% weight=100
+    //% weight=98 blockGap=50
     //% speed.min=1 speed.max=100
     //% action.fieldEditor="gridpicker" action.fieldOptions.columns=2
     export function do_action(action: action_name, step: number = 1, speed: number = 50): void {
@@ -397,7 +407,7 @@ namespace sloth {
                 servo_move(data, speed);
             }
         }
-        home()
+        stand_still()
     }
 
     function select_servo() {   // select_mode_flag == 1
@@ -442,7 +452,7 @@ namespace sloth {
             left_foot_value = temp_cali_value
             //sloth.servo_write(servos[1], 90 + left_foot_value)
         }
-        sloth.calibrate(
+        sloth.set_offset(
             left_leg_value,
             left_foot_value,
             right_leg_value,
@@ -488,8 +498,8 @@ namespace sloth {
     /**
      * Calibrate 4 servos by buttonA, buttonB, and A+B.
      */
-    //% blockId=sloth_cali_by_button block="calibrate by buttons"
-    //% weight=100
+    //% blockId=sloth_cali_by_button block="calibrate"
+    //% weight=45 blockGap=10
     export function cali_by_button(): void {
         basic.showString("Cali")//brate 4 servos by button A, B & A+B")
 
@@ -554,4 +564,105 @@ namespace sloth {
 
     }
 
+
+    /**
+     * Volume of the mic get.
+     */
+    //% blockId=sloth_volume_of_heard block="volume of heard"
+    //% weight=65 blockGap=10
+    export function volume_of_heard(): number {
+        let volume: number = 0
+        //for (let i = 0; i < 20; i++) {
+        volume = pins.analogReadPin(AnalogPin.P2)// + volume
+        //}
+        volume = 1023 - volume// / 20
+        return volume
+    }
+
+
+    function mic_init(threshold: number){
+        control.inBackground(() => {
+            let flag = false
+            let last_flag = false
+            while (true) {
+                let value = sloth.volume_of_heard()
+                if (value > threshold) {
+                    flag = true
+                } else {
+                    flag = false
+                }
+                if (flag != last_flag) {
+                    if (flag) {
+                        control.raiseEvent(event_src_mic, event_mic_heard)
+                        basic.pause(300)
+                    }
+                    last_flag = flag
+                }
+                basic.pause(1)
+            }
+        })
+    }
+    /**
+     * Mic get voice.
+     */
+    //% blockId=sloth_mic_get_voice block="on heard over |%threshold"
+    //% threshold.min=0 threshold.max=1023
+    //% weight=70 blockGap=10
+    export function onHeard(threshold: number = 550, handler: Action) {
+        mic_init(threshold);
+        control.onEvent(event_src_mic, event_mic_heard, handler); // register handler
+    }
+    /**
+    function is_get_voice(threshold: number = 1): boolean {
+
+        let volume: number = volume_of_heard()
+        if (volume > threshold)
+            return true
+        else
+            return false
+    }**/
+
+    /**
+     * IR detect obstacle.
+     */
+    //% blockId=sloth_IR_detect_obstacle block="obstacle detected"
+    //% weight=55 blockGap=50
+    export function obstacle_detected(): boolean {
+        if (pins.digitalReadPin(DigitalPin.P12) == 0)
+            return true
+        else
+            return false
+    }
+
+    /*
+    function ir_init(){
+        control.inBackground(() => {
+            let last_value = 0
+            while (true) {
+                let value = pins.digitalReadPin(DigitalPin.P12)
+                if (value != last_value) {
+                    if (value == 0) {
+                        control.raiseEvent(EventBusSource.MICROBIT_ID_IO_P12, EventBusValue.MICROBIT_PIN_EVT_FALL)
+                        basic.pause(300)
+                    }
+                    last_value = value
+                }
+                basic.pause(1)
+            }
+        })
+    }*/
+    /**
+     * IR detect obstacle.
+     *
+    //% blockId=sloth_ir_get_obstacle block="on detect obstacle"
+    //% weight=100
+    export function onObstacle(handler: Action) {
+        ir_init();
+        control.onEvent(
+            EventBusSource.MICROBIT_ID_IO_P12,
+            EventBusValue.MICROBIT_PIN_EVT_FALL,
+            handler
+        ); // register handler
+    }
+    */
 }
