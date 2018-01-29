@@ -361,7 +361,6 @@ namespace sloth {
 
     /**
      * stand still: 4 servos turn to 90 degree
-     * @param: none
      */
     //% blockId=sloth_stand_still block="stand still"
     //% weight=100 blockGap=10
@@ -370,6 +369,9 @@ namespace sloth {
         servo_write_all(servo_positions);
     }
 
+    /**
+     * set offset for 4 servos: you can use block "calibrate" on "startup", to get the value to fill in the blank
+     */
     //% blockId=sloth_set_offset block="set offset | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
     //% weight=45
     //% o1.min=-30 o1.max=30
@@ -381,6 +383,10 @@ namespace sloth {
         stand_still();
     }
 
+    /**
+     * set gesture for sloth:bit: fill in the blank to drive servo turn the angle and show gesture for you. This block 
+     * is just for advance, pay attention to set value, and provide blocking protection to the servos
+     */
     //% blockId=sloth_set_gesture block="set gesture | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
     //% o1.min=-90 o1.max=90
     //% o2.min=-90 o2.max=90
@@ -407,7 +413,7 @@ namespace sloth {
                 servo_move(data, speed);
             }
         }
-        stand_still()
+        // stand_still()
     }
 
     function select_servo() {   // select_mode_flag == 1
@@ -603,7 +609,8 @@ namespace sloth {
         })
     }
     /**
-     * Mic get voice.
+     * The event mic get voice more then the threshold.
+     * @param threshold ; eg: 550
      */
     //% blockId=sloth_mic_get_voice block="on heard over |%threshold"
     //% threshold.min=0 threshold.max=1023
@@ -612,7 +619,8 @@ namespace sloth {
         mic_init(threshold);
         control.onEvent(event_src_mic, event_mic_heard, handler); // register handler
     }
-    /**
+
+    /*
     function is_get_voice(threshold: number = 1): boolean {
 
         let volume: number = volume_of_heard()
@@ -620,11 +628,11 @@ namespace sloth {
             return true
         else
             return false
-    }**/
+    }*/
 
     /**
-     * IR detect obstacle.
-     */
+     * IR detect obstacle. IR on digital pin 12, when detected, pin 12 is low
+     **/
     //% blockId=sloth_IR_detect_obstacle block="obstacle detected"
     //% weight=55 blockGap=50
     export function obstacle_detected(): boolean {
