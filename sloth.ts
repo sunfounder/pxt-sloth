@@ -44,26 +44,27 @@ namespace sloth {
 
     let action_data = [
         [    // walk
-            [0, 0, 0, -40],
-            [0, -30, 0, -40],
-            [30, -30, 30, -40],
-            [30, 0, 30, 0],
-            [30, 40, 30, 0],
-            [30, 40, 30, 30],
-            [-30, 40, -30, 30],
+            //LL, LF, RL, RF
+            [0, 40, 0, 15],
+            [-30, 40, -30, 15],
             [-30, 0, -30, 0],
+
+            [0, -15, 0, -40],
+            [30, -15, 30, -40],
+            [30, 0, 30, 0],
         ],
         [    // walk backward
-            [0, 0, 0, -40],
-            [0, -30, 0, -40],
-            [-30, -30, -30, -40],
-            [-30, 0, -30, 0],
-            [-30, 40, -30, 0],
-            [-30, 40, -30, 30],
-            [30, 40, 30, 30],
+            //LL, LF, RL, RF
+            [0, 40, 0, 15],
+            [30, 40, 30, 15],
             [30, 0, 30, 0],
+
+            [0, -15, 0, -40],
+            [-30, -15, -30, -40],
+            [-30, 0, -30, 0],
         ],
         [   // turn left
+            //LL, LF, RL, RF
             [-30, 0, 0, -40],
             [-30, -30, 0, -40],
             [0, -30, 0, -40],
@@ -74,6 +75,7 @@ namespace sloth {
             [0, 0, 0, 0],
         ],
         [   // turn right
+            //LL, LF, RL, RF
             [0, 40, 30, 0],
             [0, 40, 30, 30],
             [0, 40, 0, 30],
@@ -330,7 +332,7 @@ namespace sloth {
     }
 
     /**
-     * servo move, input 4 elements array, to move all servo
+     * Servo move, input 4 elements array, to move all servo
      * @param speed ; eg: 50
     */
     // blockId=sloth_servo_move block="set servo move to %target| %speed|dps"
@@ -338,19 +340,35 @@ namespace sloth {
     // speed.min=1 speed.max=100
     export function servo_move(targets: number[], speed: number = 50): void {
         let flag = [0, 0, 0, 0]
+        let delta = [0, 0, 0, 0]
+        let step = [0, 0, 0, 0]
+        let min_delta = 180
+
+        for (let i = 0; i < delta.length; i++) {  // caculate the min delta degrees of 4 servos
+            delta[i] = targets[i] - servo_positions[i];
+            let temp = Math.abs(delta[i])
+            if (temp != 0 && temp < min_delta) {
+                min_delta = temp;
+            }
+        }
+
+        for (let i = 0; i < delta.length; i++) {  // use the min delta to caculate each servo's step
+            step[i] = delta[i] / min_delta;
+        }
+
         while (true) {
-            for (let i = 0; i <= servos.length; i++) {
+            for (let i = 0; i <= servos.length; i++) {  // each servo turn to target degrees by their step
                 if (servo_positions[i] != targets[i]) {
-                    if (servo_positions[i] > targets[i])
-                        servo_positions[i] -= 1;
+                    if (Math.abs(targets[i] - servo_positions[i])  > Math.abs(step[i]))
+                        servo_positions[i] += step[i];
                     else
-                        servo_positions[i] += 1;
+                        servo_positions[i] = targets[i];
                 }
                 else
                     flag[i] = 1;
             }
             servo_write_all(servo_positions);
-            basic.pause(100 / speed);
+            basic.pause(500 / speed);
             let sum = 0
             for (let i of flag)
                 sum += i;
@@ -360,7 +378,7 @@ namespace sloth {
     }
 
     /**
-     * stand still: 4 servos turn to 90 degree
+     * Stand still: 4 servos turn to 90 degrees
      */
     //% blockId=sloth_stand_still block="stand still"
     //% weight=100 blockGap=10
@@ -370,21 +388,21 @@ namespace sloth {
     }
 
     /**
-     * set offset for 4 servos: you can use block "calibrate" on "startup", to get the value to fill in the blank
+     * Set offset for 4 servos: you can use block "calibrate" on "startup", to get the value to fill in the blank
      */
-    //% blockId=sloth_set_offset block="set offset | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
+    //% blockId=sloth_set_offset block="set offset | Right Leg %o3| Left Leg %o1| Right Foot %o4| Left Foot %o2"
     //% weight=45
     //% o1.min=-30 o1.max=30
     //% o2.min=-30 o2.max=30
     //% o3.min=-30 o3.max=30
     //% o4.min=-30 o4.max=30
-    export function set_offset(o1: number, o2: number, o3: number, o4: number): void {
+    export function set_offset(o3: number, o1: number, o4: number, o2: number): void {
         offset = [o1, o2, o3, o4]
         stand_still();
     }
 
     /**
-     * set gesture for sloth:bit: fill in the blank to drive servo turn the angle and show gesture for you. This block 
+     * Set gesture for sloth:bit: fill in the blank to drive servo turn the angle and show gesture for you. This block 
      * is just for advance, pay attention to set value, and provide blocking protection to the servos
      */
     //% blockId=sloth_set_gesture block="set gesture | Left Leg %o1| Left Foot %o2| Right Leg %o3| Right Foot %o4"
@@ -395,7 +413,7 @@ namespace sloth {
     //% advanced=true
     export function set_gesture(o1: number, o2: number, o3: number, o4: number): void {
         servo_positions = [o1, o2, o3, o4]
-        servo_write_all(servo_positions);
+        servo_move(servo_positions, 50);
     }
 
     /**
@@ -459,10 +477,10 @@ namespace sloth {
             //sloth.servo_write(servos[1], 90 + left_foot_value)
         }
         sloth.set_offset(
-            left_leg_value,
-            left_foot_value,
             right_leg_value,
-            right_foot_value
+            left_leg_value,
+            right_foot_value,
+            left_foot_value
         )
         basic.pause(10)
         //basic.showNumber(temp_cali_value)
@@ -631,7 +649,7 @@ namespace sloth {
     }*/
 
     /**
-     * IR detect obstacle. IR on digital pin 12, when detected, pin 12 is low
+     * IR detect obstacle: IR on digital pin 12, when detected, pin 12 is low
      **/
     //% blockId=sloth_IR_detect_obstacle block="obstacle detected"
     //% weight=55 blockGap=50
