@@ -65,121 +65,135 @@ namespace sloth {
         ],
         [   // turn left
             //LL, LF, RL, RF
-            [-30, 0, 0, -40],
-            [-30, -30, 0, -40],
-            [0, -30, 0, -40],
-            [0, 0, 0, 0],
-            [0, 40, -30, 0],
-            [0, 40, -30, 30],
-            [0, 40, 0, 30],
-            [0, 0, 0, 0],
+            [0, 40, 0, 20],
+            [0, 40, 20, 20],
+            [0, 0, 20, 0],
+
+            [0, -20, 0, -40],
+            [0, -20, -20, -40],
+            [0, 0, -20, 0],
         ],
         [   // turn right
             //LL, LF, RL, RF
-            [0, 40, 30, 0],
-            [0, 40, 30, 30],
-            [0, 40, 0, 30],
-            [0, 0, 0, 0],
-            [30, 0, 0, -40],
-            [30, -30, 0, -40],
-            [0, -30, 0, -40],
-            [0, 0, 0, 0],
+            [0, -20, 0, -40],
+            [-20, -20, 0, -40],
+            [-20, 0, 0, 0],
+
+            [0, 40, 0, 20],
+            [20, 40, 0, 20],
+            [20, 0, 0, 0],
         ],
         [   // moon walk left
-            [0, 0, 0, -20],
-            [0, 20, 0, -40],
-            [0, 40, 0, -20],
-            [0, 20, 0, 0],
+            [0, 0, 0, -30],
+            [0, 30, 0, -60],
+            [0, 60, 0, -30],
+            [0, 30, 0, 0],
             [0, 0, 0, 0]
         ],
         [   // moon walk right
-            [0, 20, 0, 0],
-            [0, 40, 0, -20],
-            [0, 20, 0, -40],
-            [0, 0, 0, -20],
+            [0, 30, 0, 0],
+            [0, 60, 0, -30],
+            [0, 30, 0, -60],
+            [0, 0, 0, -30],
             [0, 0, 0, 0]
         ],
         [   // shake left
-            [-40, 0, -20, 0],
-            [-40, 40, -20, 30],
-            [-20, 40, -20, 30],
-            [-40, 40, -20, 30],
-            [-20, 40, -20, 30],
+            //LL, LF, RL, RF
+            [-40, 70, -40, 30],
+            [-40, 30, -40, 30],
+
+            [-10, 30, -40, 30],
+            [-40, 30, -40, 30],
+            [-10, 30, -40, 30],
+            [-40, 30, -40, 30],
+
+            [-40, 70, -40, 30],
+            [0, 0, 0, 0],
         ],
         [   // shake right
-            [20, 0, 40, 0],
-            [20, -30, 40, -30],
-            [20, -30, 10, -30],
-            [20, -30, 40, -30],
-            [20, -30, 10, -30],
+            //LL, LF, RL, RF
+            [40, -30, 40, -70],
+            [40, -30, 40, -30],
+
+            [10, -30, 40, -30],
+            [40, -30, 40, -30],
+            [10, -30, 40, -30],
+            [40, -30, 40, -30],
+
+            [40, -30, 40, -70],
+            [0, 0, 0, 0],
         ],
         [   // go up and down
             [0, 50, 0, -50],
+            [0, 0, 0, 0],
         ],
         [   // swing
             [0, -40, 0, 40],
+            [0, 0, 0, 0],
         ],
         [    // walk manly
-            [-20, 0, 20, -40],
-            [-20, -30, 20, -40],
-            [10, -30, 50, -40],
-            [10, 0, 50, 0],
-            [10, 40, 50, 0],
-            [10, 40, 50, 30],
-            [-50, 40, -10, 30],
-            [-50, 0, -10, 0],
+            //LL, LF, RL, RF
+            [-15, -15, 15, -40],
+            [10, -30, 40, -40],
+            [10, 0, 40, 0],
+
+            [-15, 40, 15, 15],
+            [-40, 40, -10, 30],
+            [-40, 0, -10, 0],
         ],
         [    // walk backward manly
-            [-20, 0, 20, -40],
-            [-20, -30, 20, -40],
-            [-50, -30, -10, -40],
-            [-50, 0, -10, 0],
-            [-50, 40, -10, 0],
-            [-50, 40, -10, 30],
-            [10, 40, 50, 30],
-            [10, 0, 50, 0],
+            //LL, LF, RL, RF
+            [-15, -15, 15, -40],
+            [-40, -30, -10, -40],
+            [-40, 0, -10, 0],
+
+            [-15, 40, 15, 15],
+            [10, 40, 40, 30],
+            [10, 0, 40, 0],
         ],
         [    // walk shily
-            [15, 0, -15, -40],
-            [15, -30, -15, -40],
+            //LL, LF, RL, RF
+            [10, -15, -10, -40],
             [25, -30, -5, -40],
             [25, 0, -5, 0],
-            [25, 40, -5, 0],
-            [25, 40, -5, 30],
+
+            [10, 40, -10, 15],
             [5, 40, -25, 30],
             [5, 0, -25, 0],
         ],
         [    // walk backward shily
-            [15, 0, -15, -40],
-            [15, -30, -15, -40],
-            [-5, -30, -25, -40],
-            [-5, 0, -25, 0],
-            [-5, 40, -25, 0],
-            [-5, 40, -25, 30],
-            [25, 40, 5, 30],
-            [25, 0, 5, 0],
+            //LL, LF, RL, RF
+            [10, -15, -10, -40],
+            [5, -30, -25, -40],
+            [5, 0, -25, 0],
+
+            [10, 40, -10, 15],
+            [25, 40, -5, 30],
+            [25, 0, -5, 0],
         ],
 
         [   // big swing
             [0, -90, 0, 90],
+            [0, 0, 0, 0],
         ],
     ]
+
     export enum action_name {
-        walk = 0,
-        walk_backward = 1,
-        turn_left = 2,
-        turn_right = 3,
-        moonwalk_left = 4,
-        moonwalk_right = 5,
-        shake_left = 6,
-        shake_right = 7,
-        go_up_and_down = 8,
-        swing = 9,
-        walk_manly = 10,
+        walk                = 0,
+        walk_backward       = 1,
+        turn_left           = 2,
+        turn_right          = 3,
+        moonwalk_left       = 4,
+        moonwalk_right      = 5,
+        shake_left          = 6,
+        shake_right         = 7,
+        go_up_and_down      = 8,
+        swing               = 9,
+        walk_manly          = 10,
         walk_backward_manly = 11,
-        walk_shily = 12,
+        walk_shily          = 12,
         walk_backward_shily = 13,
-        big_swing = 14
+        big_swing           = 14
     }
 
     let initialized = false
@@ -268,7 +282,7 @@ namespace sloth {
         return val;
     }
 
-    function initPCA9685(): void {
+    function init(): void {
         i2cwrite(MODE1, 0x00)
         setFreq(50);
         initialized = true
@@ -314,7 +328,7 @@ namespace sloth {
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
     export function servo_write(channel: PWMChn, degree: number): void {
         if (!initialized) {
-            initPCA9685()
+            init()
         }
         // 50hz: 20,000 us
         let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
@@ -335,45 +349,41 @@ namespace sloth {
      * Servo move, input 4 elements array, to move all servo
      * @param speed ; eg: 50
     */
-    // blockId=sloth_servo_move block="set servo move to %target| %speed|dps"
-    // weight=10
-    // speed.min=1 speed.max=100
+    //% blockId=sloth_servo_move block="set servo move to %target| %speed|dps"
+    //% weight=10
+    //% speed.min=1 speed.max=100
     export function servo_move(targets: number[], speed: number = 50): void {
-        let flag = [0, 0, 0, 0]
         let delta = [0, 0, 0, 0]
-        let step = [0, 0, 0, 0]
-        let min_delta = 180
+        let steps = [0, 0, 0, 0]
+        let max_delta = 0
 
-        for (let i = 0; i < delta.length; i++) {  // caculate the min delta degrees of 4 servos
+        for (let i = 0; i < delta.length; i++) {
             delta[i] = targets[i] - servo_positions[i];
             let temp = Math.abs(delta[i])
-            if (temp != 0 && temp < min_delta) {
-                min_delta = temp;
+            if (temp > max_delta) {
+                max_delta = temp;
             }
         }
+        max_delta = 2 * max_delta
 
-        for (let i = 0; i < delta.length; i++) {  // use the min delta to caculate each servo's step
-            step[i] = delta[i] / min_delta;
-        }
 
-        while (true) {
-            for (let i = 0; i <= servos.length; i++) {  // each servo turn to target degrees by their step
-                if (servo_positions[i] != targets[i]) {
-                    if (Math.abs(targets[i] - servo_positions[i])  > Math.abs(step[i]))
-                        servo_positions[i] += step[i];
-                    else
-                        servo_positions[i] = targets[i];
+        if (max_delta != 0) {
+            for (let i = 0; i < delta.length; i++) {
+                steps[i] = max_delta/Math.abs(delta[i]);
+            }
+
+            for (let i = 0; i < max_delta; i++){
+                for (let j = 0; j <= servos.length; j++) {
+                    if ( i % steps[j] == 0) {
+                        if (servo_positions[j] != targets[j]) {
+                            servo_positions[j] = servo_positions[j] + (delta[j] / Math.abs(delta[j]));
+
+                            servo_write_all(servo_positions);
+                        }
+                    }
+                    control.waitMicros((100-speed)*10);
                 }
-                else
-                    flag[i] = 1;
             }
-            servo_write_all(servo_positions);
-            basic.pause(500 / speed);
-            let sum = 0
-            for (let i of flag)
-                sum += i;
-            if (sum == flag.length)
-                break;
         }
     }
 
@@ -383,8 +393,8 @@ namespace sloth {
     //% blockId=sloth_stand_still block="stand still"
     //% weight=100 blockGap=10
     export function stand_still(): void {
-        servo_positions = [0, 0, 0, 0];
-        servo_write_all(servo_positions);
+        let servo_targets = [0, 0, 0, 0];
+        servo_move(servo_targets);
     }
 
     /**
@@ -398,7 +408,8 @@ namespace sloth {
     //% o4.min=-30 o4.max=30
     export function set_offset(o3: number, o1: number, o4: number, o2: number): void {
         offset = [o1, o2, o3, o4]
-        stand_still();
+        servo_positions = [0, 0, 0, 0];
+        servo_write_all(servo_positions);
     }
 
     /**
@@ -412,8 +423,19 @@ namespace sloth {
     //% o4.min=-90 o4.max=90
     //% advanced=true
     export function set_gesture(o1: number, o2: number, o3: number, o4: number): void {
-        servo_positions = [o1, o2, o3, o4]
-        servo_move(servo_positions, 50);
+        let servo_targets = [o1, o2, o3, o4]
+        servo_move(servo_targets, 50);
+    }
+
+    /**
+     * Actions.
+     */
+    //% blockId=sloth_actions block="%action"
+    //% weight=98
+    //% advanced=true
+    //% action.fieldEditor="gridpicker" action.fieldOptions.columns=2
+    export function actions(action: action_name): number {
+        return action
     }
 
     /**
@@ -421,11 +443,10 @@ namespace sloth {
      * @param step ; eg: 1
      * @param speed ; eg: 50
      */
-    //% blockId=sloth_do_action block="%action|%step|step in %speed|speed"
+    //% blockId=sloth_do_action block="%action=sloth_actions|%step|step in %speed|speed"
     //% weight=98 blockGap=50
     //% speed.min=1 speed.max=100
-    //% action.fieldEditor="gridpicker" action.fieldOptions.columns=2
-    export function do_action(action: action_name, step: number = 1, speed: number = 50): void {
+    export function do_action(action: number, step: number = 1, speed: number = 50): void {
         for (let i = 0; i < step; i++) {
             for (let data of action_data[action]) {
                 servo_move(data, speed);
@@ -604,7 +625,7 @@ namespace sloth {
     }
 
 
-    function mic_init(threshold: number){
+    function mic_init(threshold: number) {
         control.inBackground(() => {
             let flag = false
             let last_flag = false
