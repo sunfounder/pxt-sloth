@@ -43,8 +43,7 @@ sloth.cali_by_button()
 
 ## Supported targets
 
-* for PXT/sunfounder
-* for PXT/sloth
+* for PXT/microbit
 
 
 ## License
