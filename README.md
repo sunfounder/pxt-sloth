@@ -31,7 +31,7 @@ Use ``||sloth.obstacle_detected||``, if IR sensor get signal, return ture.
 Use ``||sloth.onHeard||``, event sloth:bit heard the sound whitch volume over threshold.    
 
 ## Examples:
-###Sloth:bit do actions
+### Sloth:bit do actions
 
 This little program will let the sloth:bit do actions.
 The sloth:bit show a number and then do action, it will do all actions build-in, each action for twice.
