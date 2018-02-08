@@ -35,7 +35,7 @@ sloth.volume_of_heard()
 sloth.servo_move([0, 0, 0, 0], 50)  
 ```
 
-Use ``||set_offset||`` to set offset for stand still.
+Use ``||set_offset||`` to set offset for stand still.  
 Use ``||set_gesture||`` to set gesture for sloth bit.  
 use ``||actions||`` to get actions build-in.  
 Use ``||cali_by_button||`` on start to calibrate the servos, and get value for offset on LED screen.  
