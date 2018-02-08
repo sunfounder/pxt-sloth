@@ -26,9 +26,9 @@ Use ``||sloth.cali_by_button||`` on start to calibrate the servos, and get value
 
 ### Sensors  
 
-Use ``||sloth.volume_of_heard||`` to return volume of sound sensor get.
-Use ``||sloth.obstacle_detected||``, if IR sensor get signal, return ture 
-Use ``||sloth.onHeard||``, event sloth:bit heard the sound whitch volume over threshold  
+Use ``||sloth.volume_of_heard||`` to return volume of sound sensor get.  
+Use ``||sloth.obstacle_detected||``, if IR sensor get signal, return ture.   
+Use ``||sloth.onHeard||``, event sloth:bit heard the sound whitch volume over threshold.    
 
 ## Examples:
 ###Sloth:bit do actions
