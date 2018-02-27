@@ -1,7 +1,7 @@
 
 //
 //% weight=5 color=#1BAFEA icon="\uf1b0"
-namespace sloth {
+namespace custom {
     let right_leg = PWMChn.CH6
     let right_foot = PWMChn.CH7
     let left_foot = PWMChn.CH8
@@ -179,21 +179,21 @@ namespace sloth {
     ]
 
     export enum action_name {
-        walk                = 0,
-        walk_backward       = 1,
-        turn_left           = 2,
-        turn_right          = 3,
-        moonwalk_left       = 4,
-        moonwalk_right      = 5,
-        shake_left          = 6,
-        shake_right         = 7,
-        go_up_and_down      = 8,
-        swing               = 9,
-        walk_manly          = 10,
+        walk = 0,
+        walk_backward = 1,
+        turn_left = 2,
+        turn_right = 3,
+        moonwalk_left = 4,
+        moonwalk_right = 5,
+        shake_left = 6,
+        shake_right = 7,
+        go_up_and_down = 8,
+        swing = 9,
+        walk_manly = 10,
         walk_backward_manly = 11,
-        walk_shily          = 12,
+        walk_shily = 12,
         walk_backward_shily = 13,
-        big_swing           = 14
+        big_swing = 14
     }
 
     let initialized = false
@@ -304,8 +304,17 @@ namespace sloth {
         i2cwrite(MODE1, oldmode | 0xa1);
     }
 
+    /**
+     * Set pwm output. Be careful to use this block to your servos,
+        right_leg = CH6,
+        right_foot = CH7,
+        left_foot = CH8,
+        left_leg = CH9,
+       other channels for DIY
+    */
     //% blockId=sloth_set_pwm block="pwm set channel %channel|on: %on|off: %off"
     //% advanced=true
+    //% weight=20
     //% on.min=0 on.max=4095
     //% off.min=0 off.max=4095
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
@@ -322,23 +331,38 @@ namespace sloth {
         pins.i2cWriteBuffer(PCA9685_ADDRESS, buf);
     }
 
+    /**
+     * Set servo to degree(0~180),
+        right_leg = CH6,
+        right_foot = CH7,
+        left_foot = CH8,
+        left_leg = CH9
+    */
     //% blockId=sloth_servo_write block="set servo %channel|degree %degree"
     //% advanced=true
+    //% weight=50
     //% degree.min=0 degree.max=180
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
     export function servo_write(channel: PWMChn, degree: number): void {
         if (!initialized) {
             init()
         }
-        // 50hz: 20,000 us
-        let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
-        let value = v_us * 4096 / 20000
-        setPwm(channel, 0, value)
+        if (degree < 180 && degree > 0) {
+            // 50hz: 20,000 us
+            let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
+            let value = v_us * 4096 / 20000
+            setPwm(channel, 0, value)
+        }
     }
 
-    // blockId=sloth_servo_write_all block="set servo all degree %angles"
-    // weight=10
-    // angles.min=0 angles.max=180
+    /**
+     * Servo move, input 4 elements array, to move all servo
+     * @param speed ; eg: 50
+    */
+    //% blockId=sloth_servo_write_all block="set servo all degree %angles"
+    //% weight=30
+    //% advanced=true
+    //% angles.min=0 angles.max=180
     export function servo_write_all(angles: number[]): void {
         for (let i = 0; i < servos.length; i++) {
             servo_write(servos[i], origin_positions[i] + angles[i] + offset[i]); // ralative angle to home
@@ -350,7 +374,8 @@ namespace sloth {
      * @param speed ; eg: 50
     */
     //% blockId=sloth_servo_move block="set servo move to %target| %speed|dps"
-    //% weight=10
+    //% weight=40
+    //% advanced=true
     //% speed.min=1 speed.max=100
     export function servo_move(targets: number[], speed: number = 50): void {
         let delta = [0, 0, 0, 0]
@@ -369,19 +394,19 @@ namespace sloth {
 
         if (max_delta != 0) {
             for (let i = 0; i < delta.length; i++) {
-                steps[i] = max_delta/Math.abs(delta[i]);
+                steps[i] = max_delta / Math.abs(delta[i]);
             }
 
-            for (let i = 0; i < max_delta; i++){
+            for (let i = 0; i < max_delta; i++) {
                 for (let j = 0; j <= servos.length; j++) {
-                    if ( i % steps[j] == 0) {
+                    if (i % steps[j] == 0) {
                         if (servo_positions[j] != targets[j]) {
                             servo_positions[j] = servo_positions[j] + (delta[j] / Math.abs(delta[j]));
 
                             servo_write_all(servo_positions);
                         }
                     }
-                    control.waitMicros((100-speed)*10);
+                    control.waitMicros((100 - speed) * 10);
                 }
             }
         }
@@ -422,6 +447,7 @@ namespace sloth {
     //% o3.min=-90 o3.max=90
     //% o4.min=-90 o4.max=90
     //% advanced=true
+    //% weight = 96
     export function set_gesture(o1: number, o2: number, o3: number, o4: number): void {
         let servo_targets = [o1, o2, o3, o4]
         servo_move(servo_targets, 50);
