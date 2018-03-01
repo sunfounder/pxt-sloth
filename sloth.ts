@@ -1,7 +1,7 @@
 
 //
 //% weight=5 color=#1BAFEA icon="\uf1b0"
-namespace custom {
+namespace sloth {
     let right_leg = PWMChn.CH6
     let right_foot = PWMChn.CH7
     let left_foot = PWMChn.CH8
