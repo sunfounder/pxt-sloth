@@ -707,35 +707,20 @@ namespace sloth {
             return false
     }
 
-    /*
-    function ir_init(){
-        control.inBackground(() => {
-            let last_value = 0
-            while (true) {
-                let value = pins.digitalReadPin(DigitalPin.P12)
-                if (value != last_value) {
-                    if (value == 0) {
-                        control.raiseEvent(EventBusSource.MICROBIT_ID_IO_P12, EventBusValue.MICROBIT_PIN_EVT_FALL)
-                        basic.pause(300)
-                    }
-                    last_value = value
-                }
-                basic.pause(1)
-            }
-        })
-    }*/
     /**
-     * IR detect obstacle.
-     *
-    //% blockId=sloth_ir_get_obstacle block="on detect obstacle"
-    //% weight=100
-    export function onObstacle(handler: Action) {
-        ir_init();
-        control.onEvent(
-            EventBusSource.MICROBIT_ID_IO_P12,
-            EventBusValue.MICROBIT_PIN_EVT_FALL,
-            handler
-        ); // register handler
+     * servo sweep
+     **/
+    //% blockId=sloth_servo_sweep block="servo sweep"
+    //% weight=55
+    export function servo_sweep(): void {
+        let item = 0
+        for (let i = 0; i < 181; i++) {
+            sloth.servo_write_all([item, item, item, item])
+            item = item + 1
+        }
+        for (let i = 0; i < 181; i++) {
+            sloth.servo_write_all([item, item, item, item])
+            item = item - 1
+        }
     }
-    */
 }
