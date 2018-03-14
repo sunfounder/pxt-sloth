@@ -713,14 +713,16 @@ namespace sloth {
     //% blockId=sloth_servo_sweep block="servo sweep"
     //% weight=55
     export function servo_sweep(): void {
-        let item = 0
+        let item = -90
         for (let i = 0; i < 181; i++) {
             sloth.servo_write_all([item, item, item, item])
             item = item + 1
+            basic.pause(10)
         }
         for (let i = 0; i < 181; i++) {
             sloth.servo_write_all([item, item, item, item])
             item = item - 1
+            basic.pause(10)
         }
     }
 }
