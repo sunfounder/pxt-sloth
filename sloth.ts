@@ -131,7 +131,7 @@ namespace sloth {
             [0, -40, 0, 40],
             [0, 0, 0, 0],
         ],
-        [    // walk manly
+        [    // walk boldly
             //LL, LF, RL, RF
             [-15, -15, 15, -40],
             [10, -30, 40, -40],
@@ -141,7 +141,7 @@ namespace sloth {
             [-40, 40, -10, 30],
             [-40, 0, -10, 0],
         ],
-        [    // walk backward manly
+        [    // walk backward boldly
             //LL, LF, RL, RF
             [-15, -15, 15, -40],
             [-40, -30, -10, -40],
@@ -151,7 +151,7 @@ namespace sloth {
             [10, 40, 40, 30],
             [10, 0, 40, 0],
         ],
-        [    // walk shily
+        [    // walk shyly
             //LL, LF, RL, RF
             [10, -15, -10, -40],
             [25, -30, -5, -40],
@@ -161,7 +161,7 @@ namespace sloth {
             [5, 40, -25, 30],
             [5, 0, -25, 0],
         ],
-        [    // walk backward shily
+        [    // walk backward shyly
             //LL, LF, RL, RF
             [10, -15, -10, -40],
             [5, -30, -25, -40],
@@ -189,10 +189,10 @@ namespace sloth {
         shake_right = 7,
         go_up_and_down = 8,
         swing = 9,
-        walk_manly = 10,
-        walk_backward_manly = 11,
-        walk_shily = 12,
-        walk_backward_shily = 13,
+        walk_boldly = 10,
+        walk_backward_boldly = 11,
+        walk_shyly = 12,
+        walk_backward_shyly = 13,
         big_swing = 14
     }
 
