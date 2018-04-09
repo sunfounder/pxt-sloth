@@ -1,5 +1,5 @@
 # Sloth:bit
-This library provides a driver for sloth:bit from sunfounder, see https://www.sunfounder.com/
+This library provides a driver for sloth:bit from sunfounder, see  https://www.sunfounder.com/humanoid-robot-bbc-micro-bit.html  
 
 
 ## Basic usage
