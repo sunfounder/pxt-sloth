@@ -2,10 +2,10 @@
 //
 //% weight=5 color=#1BAFEA icon="\uf1b0"
 namespace sloth {
-    let right_leg = PWMChn.CH6
-    let right_foot = PWMChn.CH7
-    let left_foot = PWMChn.CH8
-    let left_leg = PWMChn.CH9
+    let right_leg = PWMChn.Right_Leg
+    let right_foot = PWMChn.Right_Foot
+    let left_foot = PWMChn.Left_Foot
+    let left_leg = PWMChn.Left_Leg
 
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
@@ -24,22 +24,22 @@ namespace sloth {
     const ALL_LED_OFF_H = 0xFD
 
     export enum PWMChn {
-        CH0 = 0,
-        CH1 = 1,
-        CH2 = 2,
-        CH3 = 3,
-        CH4 = 4,
-        CH5 = 5,
-        CH6 = 6,
-        CH7 = 7,
-        CH8 = 8,
-        CH9 = 9,
-        CH10 = 10,
-        CH11 = 11,
-        CH12 = 12,
-        CH13 = 13,
-        CH14 = 14,
-        CH15 = 15
+        CH1 = 0,
+        CH2 = 1,
+        CH3 = 2,
+        CH4 = 3,
+        CH5 = 4,
+        CH6 = 5,
+        Right_Leg  = 6,
+        Right_Foot = 7,
+        Left_Foot  = 8,
+        Left_Leg   = 9,
+        CH7  = 10,
+        CH8  = 11,
+        CH9  = 12,
+        CH10 = 13,
+        CH11 = 14,
+        CH12 = 15
     }
 
     let action_data = [
