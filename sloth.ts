@@ -319,6 +319,9 @@ namespace sloth {
     //% off.min=0 off.max=4095
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
     export function setPwm(channel: PWMChn, on: number, off: number): void {
+        if (!initialized) {
+            init()
+        }
         if (channel < 0 || channel > 15)
             return;
 
@@ -344,10 +347,7 @@ namespace sloth {
     //% degree.min=0 degree.max=180
     //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=4
     export function servo_write(channel: PWMChn, degree: number): void {
-        if (!initialized) {
-            init()
-        }
-        if (degree < 180 && degree > 0) {
+        if (degree < 181 && degree > -1) {
             // 50hz: 20,000 us
             let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
             let value = v_us * 4096 / 20000
