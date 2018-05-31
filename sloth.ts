@@ -7,6 +7,8 @@ namespace sloth {
     let left_foot = PWMChn.Left_Foot
     let left_leg = PWMChn.Left_Leg
 
+    const minPulse = 500
+    const maxPulse = 2500
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
     const MODE2 = 0x01
@@ -24,19 +26,19 @@ namespace sloth {
     const ALL_LED_OFF_H = 0xFD
 
     export enum PWMChn {
+        Right_Leg = 6,
+        Right_Foot = 7,
+        Left_Foot = 8,
+        Left_Leg = 9,
         CH1 = 0,
         CH2 = 1,
         CH3 = 2,
         CH4 = 3,
         CH5 = 4,
         CH6 = 5,
-        Right_Leg  = 6,
-        Right_Foot = 7,
-        Left_Foot  = 8,
-        Left_Leg   = 9,
-        CH7  = 10,
-        CH8  = 11,
-        CH9  = 12,
+        CH7 = 10,
+        CH8 = 11,
+        CH9 = 12,
         CH10 = 13,
         CH11 = 14,
         CH12 = 15
@@ -349,7 +351,7 @@ namespace sloth {
     export function servo_write(channel: PWMChn, degree: number): void {
         if (degree < 181 && degree > -1) {
             // 50hz: 20,000 us
-            let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
+            let v_us = (degree * (maxPulse - minPulse) / 180 + minPulse) // 0.5 ~ 2.5
             let value = v_us * 4096 / 20000
             setPwm(channel, 0, value)
         }
